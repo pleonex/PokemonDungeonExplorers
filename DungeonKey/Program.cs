@@ -29,16 +29,13 @@ namespace DungeonKey
                 Assembly.GetExecutingAssembly().GetName().Version);
 
 
-            Console.WriteLine("SOS-mail password:");
-            string password = "S8H@K7 Y831X= S6SCFK 8-%&46 1WW8MH P73T7R PP+#+# 9C8RXM W8-S4Q";
-            // string password = Console.ReadLine();
-            password = password.Replace(" ", "");
+            Console.Write("SOS-mail password: ");
+            string password = Console.ReadLine();
 
-            MailInformation mail = null;
-            // TODO: do stuff
+            MailInformation mail = MailConverter.Convert(password);
 
             Console.WriteLine("Mission information:");
-            mail?.PrintInformation();
+            mail.PrintInformation();
         }
 
         static void FailExit()

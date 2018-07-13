@@ -53,21 +53,21 @@ namespace DungeonKey
 
         public void PrintInformation()
         {
-            Console.WriteLine($"* Type: ${Type}");
-            Console.WriteLine($"* LocationId: ${LocationId:X2}");
-            Console.WriteLine($"* FloorNumber: ${FloorNumber}");
-            Console.WriteLine($"* Unknown08: ${Unknown08:X6}");
-            Console.WriteLine($"* Unknown0C: ${Unknown0C:X8}");
-            Console.WriteLine($"* Unknown10: ${Unknown10:X8}");
-            Console.WriteLine($"* UID: ${UID:X16}");
-            Console.WriteLine($"* ClientNameType: ${ClientNameType:X2}");
-            Console.WriteLine($"* ClientName: ${ClientName}");
-            Console.WriteLine($"* UnknownA0: ${UnknownA0:X4}");
-            Console.WriteLine($"* UnknownA2: ${UnknownA2:X4}");
-            Console.WriteLine($"* UnknownA4: ${UnknownA4:X16}");
-            Console.WriteLine($"* RemainingAttempts: ${RemainingAttempts}");
-            Console.WriteLine($"* UnknownAD: ${UnknownAD:X2}");
-            Console.WriteLine($"* GameType: ${GameType}");
+            Console.WriteLine($"* Type: {Type}");
+            Console.WriteLine($"* LocationId: 0x{LocationId:X2}");
+            Console.WriteLine($"* FloorNumber: {FloorNumber}");
+            Console.WriteLine($"* Unknown08: 0x{Unknown08:X6}");
+            Console.WriteLine($"* Unknown0C: 0x{Unknown0C:X8}");
+            Console.WriteLine($"* Unknown10: 0x{Unknown10:X8}");
+            Console.WriteLine($"* UID: 0x{UID:X16}");
+            Console.WriteLine($"* ClientNameType: 0x{ClientNameType:X2}");
+            Console.WriteLine($"* ClientName: {ClientName}");
+            Console.WriteLine($"* UnknownA0: 0x{UnknownA0:X4}");
+            Console.WriteLine($"* UnknownA2: 0x{UnknownA2:X4}");
+            Console.WriteLine($"* UnknownA4: 0x{UnknownA4:X16}");
+            Console.WriteLine($"* RemainingAttempts: {RemainingAttempts}");
+            Console.WriteLine($"* UnknownAD: 0x{UnknownAD:X2}");
+            Console.WriteLine($"* GameType: {GameType}");
         }
     }
 }
