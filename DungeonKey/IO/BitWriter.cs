@@ -18,6 +18,7 @@
 namespace DungeonKey.IO
 {
     using System;
+    using System.Text;
     using Yarhl.IO;
 
     public class BitWriter
@@ -73,6 +74,30 @@ namespace DungeonKey.IO
                 byte bit = (byte)((current >> bitIdx) & 1);
                 WriteBit(bit);
             }
+        }
+
+        public void WriteUInt16(ushort value, int length)
+        {
+            WriteBits(BitConverter.GetBytes(value), length);
+        }
+
+        public void WriteUInt32(uint value, int length)
+        {
+            WriteBits(BitConverter.GetBytes(value), length);
+        }
+
+        public void WriteUInt64(ulong value, int length)
+        {
+            WriteBits(BitConverter.GetBytes(value), length);
+        }
+
+        public void WriteString(string value, int length, string encoding)
+        {
+            byte[] data = Encoding.GetEncoding(encoding).GetBytes(value);
+            if (length > data.Length * 8)
+                Array.Resize(ref data, (length + 7) / 8);
+
+            WriteBits(data, length);
         }
     }
 }

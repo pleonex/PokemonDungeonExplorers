@@ -37,19 +37,19 @@ namespace DungeonKey
                 throw new ArgumentException("Invalid password length");
 
             // Do rounds
-            password = Permutation.Convert(password);
+            password = Permutation.Decrypt(password);
             byte[] binary = Substitution.Convert(password);
-            Scramble.Convert(binary[0], binary, 1, 0x20);
+            Scramble.Decrypt(binary[0], binary, 1, binary.Length - 2);
 
             // Validate checksum
             byte checksum = binary[0]; // checksum is the key
-            byte newChecksum = Checksum.Calculate(binary, 1, 0x21);
+            byte newChecksum = Checksum.Calculate(binary, 1, binary.Length - 1);
             if (checksum != newChecksum)
                 throw new FormatException("Invalid checksum");
 
             // Convert the binary password into the structure
             DataStream stream = new DataStream();
-            stream.Write(binary, 1, 0x21);
+            stream.Write(binary, 1, binary.Length - 1);
             BitReader reader = new BitReader(stream);
 
             MailInformation info = new MailInformation();
@@ -74,7 +74,43 @@ namespace DungeonKey
 
         public static string Convert(MailInformation info)
         {
-            throw new NotImplementedException();
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            // Serialize the structure into a bit stream
+            DataStream stream = new DataStream();
+            BitWriter writer = new BitWriter(stream);
+
+            writer.WriteBits(info.Type, 4);
+            writer.WriteBits(info.LocationId, 7);
+            writer.WriteBits(info.FloorNumber, 7);
+            if (info.Type == 1)
+                writer.WriteUInt32(info.Unknown08, 24);
+            writer.WriteUInt64(info.UID, 64);
+            writer.WriteBits(info.ClientNameType, 4);
+            writer.WriteString(info.ClientName, 80, "iso-8859-1");
+            if (info.Type != 1) {
+                writer.WriteUInt16(info.UnknownA0, 10);
+                writer.WriteUInt16(info.UnknownA2, 10);
+            }
+
+            writer.WriteUInt64(info.UnknownA4, 64);
+            writer.WriteBits((byte)info.GameType, 2);
+
+            byte[] binary = new byte[stream.Length + 2];
+            stream.Position = 0;
+            stream.Read(binary, 1, binary.Length - 2);
+
+            // Create checksum
+            byte checksum = Checksum.Calculate(binary, 1, binary.Length - 1);
+            binary[0] = checksum;
+
+            // Do rounds
+            Scramble.Encrypt(checksum, binary, 1, binary.Length - 2);
+            string password = Substitution.Convert(binary);
+            password = Permutation.Encrypt(password);
+
+            return password;
         }
     }
 }

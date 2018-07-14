@@ -36,6 +36,12 @@ namespace DungeonKey
 
             Console.WriteLine("Mission information:");
             mail.PrintInformation();
+            Console.WriteLine();
+
+            if (MailConverter.Convert(mail) == password)
+                Console.WriteLine("\x1B[32m✔\x1B[0m EXACT password generated!");
+            else
+                Console.WriteLine("\x1B[91m✖\x1B[0m FAILED to generate pasword");
         }
 
         static void FailExit()

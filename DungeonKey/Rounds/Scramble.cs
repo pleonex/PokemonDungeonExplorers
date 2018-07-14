@@ -46,7 +46,17 @@ namespace DungeonKey.Rounds
             0xD0, 0x04, 0x7E, 0x05
         };
 
-        public static void Convert(byte key, byte[] data, int startIdx, int size)
+        public static void Encrypt(byte key, byte[] data, int index, int size)
+        {
+            Convert(true, key, data, index, size);
+        }
+
+        public static void Decrypt(byte key, byte[] data, int index, int size)
+        {
+            Convert(false, key, data, index, size);
+        }
+
+        private static void Convert(bool encrypt, byte key, byte[] data, int startIdx, int size)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -56,11 +66,12 @@ namespace DungeonKey.Rounds
 
             byte tableBlockSize = (byte)((key & 0x0F) + (key >> 4) + 8);
             int signedKey = key * ((key & 0x01) == 1 ? 1 : -1);
+            int opSign = encrypt ? 1 : -1;
 
             for (int i = 0; i < size; i++) {
                 int idx = (i % tableBlockSize) + signedKey;
                 idx &= 0xFF;
-                data[startIdx + i] = (byte)(data[startIdx + i] - Table[idx]);
+                data[startIdx + i] = (byte)(data[startIdx + i] + (opSign * Table[idx]));
             }
         }
     }

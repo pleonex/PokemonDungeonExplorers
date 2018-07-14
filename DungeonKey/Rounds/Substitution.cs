@@ -18,22 +18,13 @@
 namespace DungeonKey.Rounds
 {
     using System;
-    using System.Collections.Generic;
+    using System.Text;
     using IO;
     using Yarhl.IO;
 
     public static class Substitution
     {
-        readonly static Dictionary<char, byte> Map = new Dictionary<char, byte> {
-            { '#', 0x0B }, { '%', 0x1B }, { '&', 0x00 }, { '+', 0x0A },
-            { '-', 0x16 }, { '0', 0x09 }, { '1', 0x18 }, { '2', 0x19 },
-            { '3', 0x1C }, { '4', 0x10 }, { '5', 0x11 }, { '6', 0x01 },
-            { '7', 0x02 }, { '8', 0x06 }, { '9', 0x07 }, { '=', 0x1A },
-            { '@', 0x1E }, { 'C', 0x13 }, { 'F', 0x08 }, { 'H', 0x14 },
-            { 'J', 0x15 }, { 'K', 0x17 }, { 'M', 0x12 }, { 'N', 0x03 },
-            { 'P', 0x04 }, { 'Q', 0x1D }, { 'R', 0x05 }, { 'S', 0x0C },
-            { 'T', 0x0D }, { 'W', 0x1F }, { 'X', 0x0E }, { 'Y', 0x0F }
-        };
+        const string Map = "&67NPR89F0+#STXY45MCHJ-K12=%3Q@W";
 
         public static byte[] Convert(string data)
         {
@@ -43,10 +34,11 @@ namespace DungeonKey.Rounds
             // First convert chars into bytes
             byte[] converted = new byte[data.Length];
             for (int i = 0; i < data.Length; i++) {
-                if (!Map.ContainsKey(data[i]))
+                int idx = Map.IndexOf(data[i]);
+                if (idx == -1)
                     throw new ArgumentException($"Invalid char: '{data[i]:X2}'");
 
-                converted[i] = Map[data[i]];
+                converted[i] = (byte)idx;
             }
 
             // Now take the first 5 bit of each byte
@@ -61,6 +53,29 @@ namespace DungeonKey.Rounds
             converted = new byte[reducedSize];
             stream.Read(converted, 0, reducedSize);
             return converted;
+        }
+
+        public static string Convert(byte[] data)
+        {
+            // Create an stream for easy reading
+            DataStream stream = new DataStream();
+            stream.Write(data, 0, data.Length);
+            stream.Position = 0;
+
+            // Each 5 bits it's an entry
+            StringBuilder builder = new StringBuilder();
+            BitReader reader = new BitReader(stream);
+
+            while (reader.Position + 5 < reader.Length) {
+                int idx = reader.ReadByte(5);
+                if (idx >= Map.Length)
+                    throw new FormatException("Invalid password byte");
+
+                builder.Append(Map[idx]);
+            }
+
+            stream.Dispose();
+            return builder.ToString();
         }
     }
 }

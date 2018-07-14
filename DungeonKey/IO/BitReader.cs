@@ -32,6 +32,8 @@ namespace DungeonKey.IO
 
         public long Position { get; set; }
 
+        public long Length => stream.Length * 8;
+
         public byte ReadBit()
         {
             int bitIdx = (int)(Position % 8);

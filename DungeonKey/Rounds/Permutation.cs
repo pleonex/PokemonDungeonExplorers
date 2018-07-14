@@ -32,7 +32,27 @@ namespace DungeonKey.Rounds
             0x25, 0x14, 0x2F, 0x16, 0x06, 0x15
         };
 
-        public static string Convert(string data)
+        public static string Encrypt(string data)
+        {
+            if (string.IsNullOrEmpty(data))
+                throw new ArgumentNullException(nameof(data));
+
+            if (data.Length > Table.Length)
+                throw new ArgumentOutOfRangeException(nameof(data));
+
+            // Create a filled string so we can substitute characters
+            StringBuilder converted = new StringBuilder();
+            converted.Append(new string('0', data.Length));
+
+            for (int i = 0; i < data.Length; i++) {
+                int idx = Table[i];
+                converted[idx] = data[i];
+            }
+
+            return converted.ToString();
+        }
+
+        public static string Decrypt(string data)
         {
             if (string.IsNullOrEmpty(data))
                 throw new ArgumentNullException(nameof(data));
