@@ -19,40 +19,107 @@ namespace DungeonKey
 {
     using System;
 
-    public class MailInformation
+    /// <summary>
+    /// Information from a mail mission.
+    /// </summary>
+    public class MailMissionInformation
     {
+        /// <summary>
+        /// Get or set the type of mail.
+        /// </summary>
+        /// <value>Type of mail.</value>
         public byte Type { get; set; }
 
+        /// <summary>
+        /// Get or set the ID of the mission location.
+        /// </summary>
+        /// <value>The ID of the mission location.</value>
         public byte LocationId { get; set; }
 
+        /// <summary>
+        /// Get or set the floor number.
+        /// </summary>
+        /// <value>The floor number.</value>
         public byte FloorNumber { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0x08.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public uint Unknown08 { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0x0C.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public uint Unknown0C { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0x10.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public uint Unknown10 { get; set; }
 
+        /// <summary>
+        ///Get or set the unique ID.
+        /// </summary>
+        /// <value></value>
         public ulong UID { get; set; }
 
+        /// <summary>
+        /// Get or set the type of client name.
+        /// </summary>
+        /// <value>Type of client name.</value>
         public byte ClientNameType { get; set; }
 
+        /// <summary>
+        /// Get or set the client name.
+        /// </summary>
+        /// <value>Client name.</value>
         public string ClientName { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0xA0.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public ushort UnknownA0 { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0xA2.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public ushort UnknownA2 { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0xA4.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public ulong UnknownA4 { get; set; }
 
+        /// <summary>
+        /// Get or set the remaining mission attempts.
+        /// </summary>
+        /// <value>Remaining mission attempts.</value>
         public byte RemainingAttempts { get; set; }
 
+        /// <summary>
+        /// Get or set an unknown field at position 0xAD.
+        /// </summary>
+        /// <value>Unknown field.</value>
         public byte UnknownAD { get; set; }
 
+        /// <summary>
+        /// Get or set the game type.
+        /// </summary>
+        /// <value>Game type.</value>
         public GameType GameType { get; set; }
 
+        /// <summary>
+        /// Print to the standard output the information from the mail.
+        /// </summary>
         public void PrintInformation()
         {
+            Console.WriteLine("Mail information:");
             Console.WriteLine($"* Type: {Type}");
             Console.WriteLine($"* LocationId: 0x{LocationId:X2}");
             Console.WriteLine($"* FloorNumber: {FloorNumber}");

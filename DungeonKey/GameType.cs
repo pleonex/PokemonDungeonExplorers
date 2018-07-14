@@ -17,6 +17,9 @@
 //
 namespace DungeonKey
 {
+    /// <summary>
+    /// The version of Pokémon Mystery Dungeon Explorers of X game.
+    /// </summary>
     public enum GameType : byte
     {
         Time = 0,

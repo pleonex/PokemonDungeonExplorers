@@ -20,6 +20,11 @@ namespace DungeonKey.Rounds
     using System;
     using System.Text;
 
+    /// <summary>
+    /// Permute / Change the position of the data.
+    ///
+    /// This algorithms uses a table with the permutation indexes.
+    /// </summary>
     public static class Permutation
     {
         readonly static byte[] Table = {
@@ -32,41 +37,49 @@ namespace DungeonKey.Rounds
             0x25, 0x14, 0x2F, 0x16, 0x06, 0x15
         };
 
+        /// <summary>
+        /// Encrypt a string by permutating their characters.
+        /// </summary>
+        /// <param name="data">Data to encrypt.</param>
+        /// <returns>Encrypted data.</returns>
         public static string Encrypt(string data)
         {
-            if (string.IsNullOrEmpty(data))
-                throw new ArgumentNullException(nameof(data));
-
-            if (data.Length > Table.Length)
-                throw new ArgumentOutOfRangeException(nameof(data));
-
-            // Create a filled string so we can substitute characters
-            StringBuilder converted = new StringBuilder();
-            converted.Append(new string('0', data.Length));
-
-            for (int i = 0; i < data.Length; i++) {
-                int idx = Table[i];
-                converted[idx] = data[i];
-            }
-
-            return converted.ToString();
+            return Convert(data, true);
         }
 
+        /// <summary>
+        /// Decrypt a string by permutating their characters.
+        /// </summary>
+        /// <param name="data">Data to decrypt.</param>
+        /// <returns>Decrypted data.</returns>
         public static string Decrypt(string data)
         {
-            if (string.IsNullOrEmpty(data))
-                throw new ArgumentNullException(nameof(data));
+            return Convert(data, false);
+        }
 
-            if (data.Length > Table.Length)
-                throw new ArgumentOutOfRangeException(nameof(data));
+        static string Convert(string source, bool encrypt)
+        {
+            if (string.IsNullOrEmpty(source))
+                throw new ArgumentNullException(nameof(source));
 
-            StringBuilder converted = new StringBuilder();
-            for (int i = 0; i < data.Length; i++) {
-                int idx = Table[i];
-                converted.Append(data[idx]);
+            if (source.Length > Table.Length)
+                throw new ArgumentOutOfRangeException(nameof(source));
+
+            // Create a filled string so we can substitute characters at any
+            // position.
+            StringBuilder destination = new StringBuilder();
+            destination.Append(new string('0', source.Length));
+
+            for (int i = 0; i < source.Length; i++) {
+                int permIdx = Table[i];
+
+                if (encrypt)
+                    destination[permIdx] = source[i];
+                else
+                    destination[i] = source[permIdx];
             }
 
-            return converted.ToString();
+            return destination.ToString();
         }
     }
 }

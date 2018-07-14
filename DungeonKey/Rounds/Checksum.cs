@@ -19,8 +19,20 @@ namespace DungeonKey.Rounds
 {
     using System;
 
+    /// <summary>
+    /// Checksum calculation.
+    ///
+    /// The checksum algorithm sums the bytes and their indexes.
+    /// </summary>
     public static class Checksum
     {
+        /// <summary>
+        /// Calculate the checksum of the byte buffer.
+        /// </summary>
+        /// <param name="data">Data to calculate checksum.</param>
+        /// <param name="startIdx">Start index of the data.</param>
+        /// <param name="size">Size of the data to process.</param>
+        /// <returns>The checksum.</returns>
         public static byte Calculate(byte[] data, int startIdx, int size)
         {
             if (data == null)

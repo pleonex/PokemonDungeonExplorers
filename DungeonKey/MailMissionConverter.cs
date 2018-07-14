@@ -22,9 +22,20 @@ namespace DungeonKey
     using Rounds;
     using Yarhl.IO;
 
-    public static class MailConverter
+    /// <summary>
+    /// Conversion of Mail information into password.
+    /// </summary>
+    public static class MailMissionConverter
     {
-        public static MailInformation Convert(string password)
+        const int PasswordLength = 0x36;
+        const string EncodingName = "iso-8859-1";
+
+        /// <summary>
+        /// Converts a password into mail information.
+        /// </summary>
+        /// <param name="password">The password to convert.</param>
+        /// <returns>Mail information from the password.</returns>
+        public static MailMissionInformation Convert(string password)
         {
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
@@ -33,26 +44,29 @@ namespace DungeonKey
             password = password.Replace(" ", "");
             password = password.Replace(Environment.NewLine, "");
             password = password.ToUpper();
-            if (password.Length != 0x36)
+            if (password.Length != PasswordLength)
                 throw new ArgumentException("Invalid password length");
 
-            // Do rounds
+            // Do decryption rounds
+            // The last byte for "scramble" is ignored. It should be the null
+            // terminator 0x00.
             password = Permutation.Decrypt(password);
-            byte[] binary = Substitution.Convert(password);
+            byte[] binary = Substitution.Decrypt(password);
             Scramble.Decrypt(binary[0], binary, 1, binary.Length - 2);
 
             // Validate checksum
-            byte checksum = binary[0]; // checksum is the key
+            byte checksum = binary[0]; // The scramble key is the checksum too.
             byte newChecksum = Checksum.Calculate(binary, 1, binary.Length - 1);
             if (checksum != newChecksum)
                 throw new FormatException("Invalid checksum");
 
-            // Convert the binary password into the structure
+            // Convert the binary password into the structure.
+            // Write the array into a stream to use the BitReader.
             DataStream stream = new DataStream();
             stream.Write(binary, 1, binary.Length - 1);
             BitReader reader = new BitReader(stream);
 
-            MailInformation info = new MailInformation();
+            MailMissionInformation info = new MailMissionInformation();
             info.Type = reader.ReadByte(4);
             info.LocationId = reader.ReadByte(7);
             info.FloorNumber = reader.ReadByte(7);
@@ -61,7 +75,7 @@ namespace DungeonKey
             info.Unknown10 = 0x00;
             info.UID = reader.ReadUInt64(64);
             info.ClientNameType = reader.ReadByte(4);
-            info.ClientName = reader.ReadString(80, "iso-8859-1");
+            info.ClientName = reader.ReadString(80, EncodingName);
             info.UnknownA0 = (info.Type == 1) ? (ushort)0x00 : reader.ReadUInt16(10);
             info.UnknownA2 = (info.Type == 1) ? (ushort)0x00 : reader.ReadUInt16(10);
             info.UnknownA4 = reader.ReadUInt64(64);
@@ -72,7 +86,7 @@ namespace DungeonKey
             return info;
         }
 
-        public static string Convert(MailInformation info)
+        public static string Convert(MailMissionInformation info)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -81,22 +95,25 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.WriteBits(info.Type, 4);
-            writer.WriteBits(info.LocationId, 7);
-            writer.WriteBits(info.FloorNumber, 7);
+            writer.WriteByte(info.Type, 4);
+            writer.WriteByte(info.LocationId, 7);
+            writer.WriteByte(info.FloorNumber, 7);
             if (info.Type == 1)
                 writer.WriteUInt32(info.Unknown08, 24);
             writer.WriteUInt64(info.UID, 64);
-            writer.WriteBits(info.ClientNameType, 4);
-            writer.WriteString(info.ClientName, 80, "iso-8859-1");
+            writer.WriteByte(info.ClientNameType, 4);
+            writer.WriteString(info.ClientName, 80, EncodingName);
             if (info.Type != 1) {
                 writer.WriteUInt16(info.UnknownA0, 10);
                 writer.WriteUInt16(info.UnknownA2, 10);
             }
 
             writer.WriteUInt64(info.UnknownA4, 64);
-            writer.WriteBits((byte)info.GameType, 2);
+            writer.WriteByte((byte)info.GameType, 2);
 
+            // Write the stream into an array for the rounds.
+            // We allocate an extra space for the checksum (first byte)
+            // and the null terminator (last byte).
             byte[] binary = new byte[stream.Length + 2];
             stream.Position = 0;
             stream.Read(binary, 1, binary.Length - 2);
@@ -105,9 +122,10 @@ namespace DungeonKey
             byte checksum = Checksum.Calculate(binary, 1, binary.Length - 1);
             binary[0] = checksum;
 
-            // Do rounds
+            // Do encryption rounds
+            // The key is the checksum, we don't encrypt the null terminator.
             Scramble.Encrypt(checksum, binary, 1, binary.Length - 2);
-            string password = Substitution.Convert(binary);
+            string password = Substitution.Encrypt(binary);
             password = Permutation.Encrypt(password);
 
             return password;

@@ -19,6 +19,14 @@ namespace DungeonKey.Rounds
 {
     using System;
 
+    /// <summary>
+    /// Scramble / Ofuscate bytes by adding or substracting from a table.
+    ///
+    /// This algorithms uses a byte key to determine the start position in the
+    /// table. This key also defines the range of elements in the table to
+    /// iterate. In each iteration the next byte from the buffer is added or
+    /// substracted from the next element of the table.
+    /// </summary>
     public static class Scramble
     {
         readonly static byte[] Table = {
@@ -46,11 +54,25 @@ namespace DungeonKey.Rounds
             0xD0, 0x04, 0x7E, 0x05
         };
 
+        /// <summary>
+        /// Encrypt data.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="data">Data to modify in the encryption process.</param>
+        /// <param name="index">Index to start encrypting.</param>
+        /// <param name="size">Size of the data to encrypt.</param>
         public static void Encrypt(byte key, byte[] data, int index, int size)
         {
             Convert(true, key, data, index, size);
         }
 
+        /// <summary>
+        /// Decrypt data.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="data">Data to modify in the decryption process.</param>
+        /// <param name="index">Index to start decrypting.</param>
+        /// <param name="size">Size of the data to decrypt.</param>
         public static void Decrypt(byte key, byte[] data, int index, int size)
         {
             Convert(false, key, data, index, size);

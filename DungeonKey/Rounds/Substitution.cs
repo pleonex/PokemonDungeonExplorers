@@ -22,59 +22,83 @@ namespace DungeonKey.Rounds
     using IO;
     using Yarhl.IO;
 
+    /// <summary>
+    /// Substitute data elements converting 5-bits elements into a string.
+    ///
+    /// This algorithms uses map string to substitute characteres by the index
+    /// (5 bits) in the map string.
+    /// </summary>
     public static class Substitution
     {
         const string Map = "&67NPR89F0+#STXY45MCHJ-K12=%3Q@W";
+        const int ElementSize = 5;
 
-        public static byte[] Convert(string data)
+        /// <summary>
+        /// Decrypt data by substituting characters into bits.
+        /// </summary>
+        /// <param name="data">Data to decrypt.</param>
+        /// <returns>Decrypted data.</returns>
+        public static byte[] Decrypt(string data)
         {
             if (string.IsNullOrEmpty(data))
                 throw new ArgumentNullException(nameof(data));
 
-            // First convert chars into bytes
-            byte[] converted = new byte[data.Length];
-            for (int i = 0; i < data.Length; i++) {
-                int idx = Map.IndexOf(data[i]);
-                if (idx == -1)
-                    throw new ArgumentException($"Invalid char: '{data[i]:X2}'");
+            int decSize = (int)Math.Ceiling(data.Length * ElementSize / 8.0);
+            byte[] decrypted = new byte[decSize];
 
-                converted[i] = (byte)idx;
+            using (DataStream stream = new DataStream()) {
+                // Convert chars into bits
+                BitWriter writer = new BitWriter(stream);
+                for (int i = 0; i < data.Length; i++) {
+                    int idx = Map.IndexOf(data[i]);
+                    if (idx == -1)
+                        throw new ArgumentException($"Invalid char: '{data[i]}'");
+
+                    writer.WriteByte((byte)idx, ElementSize);
+                }
+
+                // Copy
+                stream.Position = 0;
+                stream.Read(decrypted, 0, decrypted.Length);
             }
 
-            // Now take the first 5 bit of each byte
-            int reducedSize = (int)Math.Ceiling(converted.Length * 5.0 / 8);
-            DataStream stream = new DataStream();
-            BitWriter writer = new BitWriter(stream);
-            for (int i = 0; i < converted.Length; i++)
-                writer.WriteBits(converted[i], 5);
-
-            // Copy
-            stream.Position = 0;
-            converted = new byte[reducedSize];
-            stream.Read(converted, 0, reducedSize);
-            return converted;
+            return decrypted;
         }
 
-        public static string Convert(byte[] data)
+        /// <summary>
+        /// Encrypt data by substituting bits into characters.
+        /// </summary>
+        /// <param name="data">Data to encrypt.</param>
+        /// <returns>Encrypted data.</returns>
+        public static string Encrypt(byte[] data)
         {
-            // Create an stream for easy reading
-            DataStream stream = new DataStream();
-            stream.Write(data, 0, data.Length);
-            stream.Position = 0;
+            if (data.Length == 0)
+                throw new ArgumentNullException(nameof(data));
 
-            // Each 5 bits it's an entry
+            string result;
+            using (DataStream stream = new DataStream()) {
+                stream.Write(data, 0, data.Length);
+                stream.Position = 0;
+                result = Encrypt(stream);
+            }
+
+            return result;
+        }
+
+        static string Encrypt(DataStream stream)
+        {
+            // Each 5 bits it's an element to substitute.
             StringBuilder builder = new StringBuilder();
             BitReader reader = new BitReader(stream);
 
-            while (reader.Position + 5 < reader.Length) {
-                int idx = reader.ReadByte(5);
+            while (reader.Position + ElementSize < reader.Length) {
+                int idx = reader.ReadByte(ElementSize);
                 if (idx >= Map.Length)
-                    throw new FormatException("Invalid password byte");
+                    throw new FormatException("Invalid password element");
 
                 builder.Append(Map[idx]);
             }
 
-            stream.Dispose();
             return builder.ToString();
         }
     }
