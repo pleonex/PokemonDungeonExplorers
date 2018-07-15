@@ -25,6 +25,8 @@ namespace DungeonKey
         Unknown = 0,
         Sos = 1,
         SosInRescue = 2,
-        Acknowledgment = 4
+        WaitingRescue = 3,
+        Acknowledgment = 4,
+        ThankYou = 5
     }
 }

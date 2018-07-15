@@ -49,18 +49,6 @@ namespace DungeonKey
         public uint Random { get; set; }
 
         /// <summary>
-        /// Get or set an unknown field at position 0x0C.
-        /// </summary>
-        /// <value>Unknown field.</value>
-        public uint Unknown0C { get; set; }
-
-        /// <summary>
-        /// Get or set an unknown field at position 0x10.
-        /// </summary>
-        /// <value>Unknown field.</value>
-        public uint Unknown10 { get; set; }
-
-        /// <summary>
         ///Get or set the unique ID.
         /// </summary>
         /// <value></value>
@@ -97,18 +85,6 @@ namespace DungeonKey
         public ulong RescuerUID { get; set; }
 
         /// <summary>
-        /// Get or set the remaining mission attempts.
-        /// </summary>
-        /// <value>Remaining mission attempts.</value>
-        public byte RemainingAttempts { get; set; }
-
-        /// <summary>
-        /// Get or set an unknown field at position 0xAD.
-        /// </summary>
-        /// <value>Unknown field.</value>
-        public byte UnknownAD { get; set; }
-
-        /// <summary>
         /// Get or set the game type.
         /// </summary>
         /// <value>Game type.</value>
@@ -124,16 +100,12 @@ namespace DungeonKey
             Console.WriteLine($"* LocationId: 0x{LocationId:X2}");
             Console.WriteLine($"* FloorNumber: {FloorNumber}");
             Console.WriteLine($"* Random: 0x{Random:X6}");
-            Console.WriteLine($"* Unknown0C: 0x{Unknown0C:X8}");
-            Console.WriteLine($"* Unknown10: 0x{Unknown10:X8}");
             Console.WriteLine($"* UID: 0x{UID:X16}");
             Console.WriteLine($"* ClientLanguage: {ClientLanguage}");
             Console.WriteLine($"* ClientName: {ClientName}");
             Console.WriteLine($"* ObjectID1: 0x{ObjectID1:X4}");
             Console.WriteLine($"* ObjectID2: 0x{ObjectID2:X4}");
             Console.WriteLine($"* RescuerUID: 0x{RescuerUID:X16}");
-            Console.WriteLine($"* RemainingAttempts: {RemainingAttempts}");
-            Console.WriteLine($"* UnknownAD: 0x{UnknownAD:X2}");
             Console.WriteLine($"* GameType: {GameType}");
         }
     }

@@ -19,6 +19,16 @@ namespace DungeonKey
 {
     public class ThankYouMail : MissionMail
     {
+        public ThankYouMail(MissionMail mail)
+        {
+            Type = MissionState.ThankYou;
 
+            // Copy info from rescue mail
+            LocationId = mail.LocationId;
+            FloorNumber = mail.FloorNumber;
+            Random = mail.Random;
+            UID = mail.UID;
+            RescuerUID = mail.RescuerUID;
+        }
     }
 }

@@ -73,13 +73,26 @@ namespace DungeonKey
 
             string ackPassword = MissionMailConverter.Convert(ackMail);
             Console.WriteLine("Rescue password: " + ackPassword);
-
-            try {
-                MissionMailConverter.Convert(ackPassword);
+            if (MissionMailConverter.ValidatePassword(ackPassword))
                 Console.WriteLine("\x1B[32m✔\x1B[0m CORRECT password generated!");
-            } catch {
+            else
                 Console.WriteLine("\x1B[91m✖\x1B[0m FAILED to generate pasword");
-            }
+
+            ThankYouMail thanksMail = new ThankYouMail(ackMail) {
+                GameType = GameType.Sky,
+                ClientLanguage = GameLanguage.English,
+                ClientName = "pleonex!!",
+                ObjectID1 = 0,
+                ObjectID2 = 0x2C
+            };
+            thanksMail.PrintInformation();
+
+            string thanksPassword = MissionMailConverter.Convert(thanksMail);
+            Console.WriteLine("Thank-YOU password: " + thanksPassword);
+            if (MissionMailConverter.ValidatePassword(thanksPassword))
+                Console.WriteLine("\x1B[32m✔\x1B[0m CORRECT password generated!");
+            else
+                Console.WriteLine("\x1B[91m✖\x1B[0m FAILED to generate pasword");
 
             Exit(0);
         }

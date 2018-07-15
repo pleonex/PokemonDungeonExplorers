@@ -71,16 +71,12 @@ namespace DungeonKey
             info.LocationId = reader.ReadByte(7);
             info.FloorNumber = reader.ReadByte(7);
             info.Random = (info.Type == MissionState.Sos) ? reader.ReadUInt32(24) : 0x00;
-            info.Unknown0C = 0x00;
-            info.Unknown10 = 0x00;
             info.UID = reader.ReadUInt64(64);
             info.ClientLanguage = (GameLanguage)reader.ReadByte(4);
             info.ClientName = reader.ReadString(80, EncodingName);
             info.ObjectID1 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
             info.ObjectID2 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
             info.RescuerUID = reader.ReadUInt64(64);
-            info.RemainingAttempts = 0x00; // TODO
-            info.UnknownAD = 0x01;
             info.GameType = (GameType)reader.ReadByte(2);
 
             return info;
@@ -134,6 +130,40 @@ namespace DungeonKey
             password = Permutation.Encrypt(password);
 
             return password;
+        }
+
+        /// <summary>
+        /// Validate a password by checking the checksum.
+        /// </summary>
+        /// <param name="password">Password to validate.</param>
+        /// <returns><c>true</c> if the password is valid, <c>false</c> otherwise.</returns>
+        public static bool ValidatePassword(string password)
+        {
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException(nameof(password));
+
+            // Sanitaze and check password
+            password = password.Replace(" ", "");
+            password = password.Replace(Environment.NewLine, "");
+            password = password.ToUpper();
+            if (password.Length != PasswordLength)
+                throw new ArgumentException("Invalid password length");
+
+            // Do decryption rounds
+            byte[] binary;
+            try {
+                password = Permutation.Decrypt(password);
+                binary = Substitution.Decrypt(password);
+                Scramble.Decrypt(binary[0], binary, 1, binary.Length - 2);
+            } catch {
+                return false;
+            }
+
+            // Validate checksum
+            byte checksum = binary[0];
+            byte newChecksum = Checksum.Calculate(binary, 1, binary.Length - 1);
+
+            return checksum == newChecksum;
         }
     }
 }
