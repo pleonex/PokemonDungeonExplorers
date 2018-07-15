@@ -25,17 +25,16 @@ namespace DungeonKey
     /// <summary>
     /// Conversion of Mail information into password.
     /// </summary>
-    public static class MissionMailConverter
+    public static class WonderSMailConverter
     {
-        const int PasswordLength = 0x36;
-        const string EncodingName = "iso-8859-1";
+        const int PasswordLength = 0x22;
 
         /// <summary>
         /// Converts a password into mail information.
         /// </summary>
         /// <param name="password">The password to convert.</param>
         /// <returns>Mail information from the password.</returns>
-        public static MissionMail Convert(string password)
+        public static WonderSMail Convert(string password)
         {
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
@@ -50,34 +49,38 @@ namespace DungeonKey
             // Do decryption rounds
             // The last byte for "scramble" is ignored. It should be the null
             // terminator 0x00.
-            password = Permutation.Decrypt(password, true);
+            password = Permutation.Decrypt(password, false);
             byte[] binary = Substitution.Decrypt(password);
-            Scramble.Decrypt(binary[0], binary, 1, binary.Length - 2);
+            Scramble.Decrypt(binary[0], binary, 4, binary.Length - 5);
 
             // Validate checksum
-            byte checksum = binary[0]; // The scramble key is the checksum too.
-            byte newChecksum = Checksum.Calculate(binary, 1, binary.Length - 1);
-            if (checksum != newChecksum)
-                throw new FormatException("Invalid checksum");
+            uint crc32 = BitConverter.ToUInt32(binary, 0);
+            uint newCrc32 = Crc32.Calculate(binary, 4, binary.Length - 5);
+            if (crc32 != newCrc32)
+               throw new FormatException("Invalid crc32");
 
             // Convert the binary password into the structure.
             // Write the array into a stream to use the BitReader.
             DataStream stream = new DataStream();
-            stream.Write(binary, 1, binary.Length - 1);
+            stream.Write(binary, 4, binary.Length - 4);
             BitReader reader = new BitReader(stream);
 
-            MissionMail info = new MissionMail();
-            info.Type = (MissionState)reader.ReadByte(4);
-            info.LocationId = reader.ReadByte(7);
-            info.FloorNumber = reader.ReadByte(7);
-            info.Random = (info.Type == MissionState.Sos) ? reader.ReadUInt32(24) : 0x00;
-            info.UID = reader.ReadUInt64(64);
-            info.ClientLanguage = (GameLanguage)reader.ReadByte(4);
-            info.ClientName = reader.ReadString(80, EncodingName);
-            info.ObjectID1 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
-            info.ObjectID2 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
-            info.RescuerUID = reader.ReadUInt64(64);
-            info.GameType = (GameType)reader.ReadByte(2);
+            WonderSMail info = new WonderSMail();
+            info.Unknown00 = reader.ReadByte(4);
+            info.Unknown01 = reader.ReadByte(4);
+            info.Unknown02 = reader.ReadByte(4);
+            info.Unknown0E = reader.ReadUInt16(11);
+            info.Unknown10 = reader.ReadUInt16(11);
+            info.Unknown12 = reader.ReadUInt16(11);
+            info.Unknown14 = reader.ReadUInt16(10);
+            info.Unknown16 = reader.ReadByte(4);
+            info.Unknown18 = reader.ReadUInt16(11);
+            info.Unknown1A = reader.ReadByte(1);
+            info.Unknown1C = reader.ReadUInt16(11);
+            info.Unknown08 = reader.ReadUInt32(24);
+            info.Unknown04 = reader.ReadByte(8);
+            info.Unknown05 = reader.ReadByte(8);
+            info.Unknown0C = reader.ReadByte(8);
 
             return info;
         }
@@ -87,7 +90,7 @@ namespace DungeonKey
         /// </summary>
         /// <param name="info">Mission to convert.</param>
         /// <returns>The password.</returns>
-        public static string Convert(MissionMail info)
+        public static string Convert(WonderSMail info)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -96,38 +99,42 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.WriteByte((byte)info.Type, 4);
-            writer.WriteByte(info.LocationId, 7);
-            writer.WriteByte(info.FloorNumber, 7);
-            if (info.Type == MissionState.Sos)
-                writer.WriteUInt32(info.Random, 24);
-            writer.WriteUInt64(info.UID, 64);
-            writer.WriteByte((byte)info.ClientLanguage, 4);
-            writer.WriteString(info.ClientName, 80, EncodingName);
-            if (info.Type != MissionState.Sos) {
-                writer.WriteUInt16(info.ObjectID1, 10);
-                writer.WriteUInt16(info.ObjectID2, 10);
-            }
-
-            writer.WriteUInt64(info.RescuerUID, 64);
-            writer.WriteByte((byte)info.GameType, 2);
+            writer.WriteByte(info.Unknown00, 4);
+            writer.WriteByte(info.Unknown01, 4);
+            writer.WriteByte(info.Unknown02, 4);
+            writer.WriteUInt16(info.Unknown0E, 11);
+            writer.WriteUInt16(info.Unknown10, 11);
+            writer.WriteUInt16(info.Unknown12, 11);
+            writer.WriteUInt16(info.Unknown14, 10);
+            writer.WriteByte(info.Unknown16, 4);
+            writer.WriteUInt16(info.Unknown18, 11);
+            writer.WriteByte(info.Unknown1A, 1);
+            writer.WriteUInt16(info.Unknown1C, 11);
+            writer.WriteUInt32(info.Unknown08, 24);
+            writer.WriteByte(info.Unknown04, 8);
+            writer.WriteByte(info.Unknown05, 8);
+            writer.WriteByte(info.Unknown0C, 8);
 
             // Write the stream into an array for the rounds.
-            // We allocate an extra space for the checksum (first byte)
+            // We allocate an extra space for the checksum (first uint)
             // and the null terminator (last byte).
-            byte[] binary = new byte[stream.Length + 2];
+            byte[] binary = new byte[stream.Length + 5];
             stream.Position = 0;
-            stream.Read(binary, 1, binary.Length - 2);
+            stream.Read(binary, 4, (int)stream.Length);
 
             // Create checksum
-            byte checksum = Checksum.Calculate(binary, 1, binary.Length - 1);
-            binary[0] = checksum;
+            uint crc32 = Crc32.Calculate(binary, 4, binary.Length - 5);
+            byte[] crc32Bytes = BitConverter.GetBytes(crc32);
+            binary[0] = crc32Bytes[0];
+            binary[1] = crc32Bytes[1];
+            binary[2] = crc32Bytes[2];
+            binary[3] = crc32Bytes[3];
 
             // Do encryption rounds
             // The key is the checksum, we don't encrypt the null terminator.
-            Scramble.Encrypt(checksum, binary, 1, binary.Length - 2);
+            Scramble.Encrypt(crc32Bytes[0], binary, 4, binary.Length - 5);
             string password = Substitution.Encrypt(binary, PasswordLength);
-            password = Permutation.Encrypt(password, true);
+            password = Permutation.Encrypt(password, false);
 
             return password;
         }
@@ -152,18 +159,17 @@ namespace DungeonKey
             // Do decryption rounds
             byte[] binary;
             try {
-                password = Permutation.Decrypt(password, true);
+                password = Permutation.Decrypt(password, false);
                 binary = Substitution.Decrypt(password);
-                Scramble.Decrypt(binary[0], binary, 1, binary.Length - 2);
+                Scramble.Decrypt(binary[0], binary, 4, binary.Length - 5);
             } catch {
                 return false;
             }
 
             // Validate checksum
-            byte checksum = binary[0];
-            byte newChecksum = Checksum.Calculate(binary, 1, binary.Length - 1);
-
-            return checksum == newChecksum;
+            uint crc32 = BitConverter.ToUInt32(binary, 0);
+            uint newCrc32 = Crc32.Calculate(binary, 4, binary.Length - 5);
+            return crc32 == newCrc32;
         }
     }
 }

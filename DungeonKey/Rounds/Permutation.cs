@@ -27,7 +27,7 @@ namespace DungeonKey.Rounds
     /// </summary>
     public static class Permutation
     {
-        readonly static byte[] Table = {
+        readonly static byte[] MissionTable = {
             0x0D, 0x07, 0x19, 0x0F, 0x04, 0x1D, 0x2A, 0x31,
             0x08, 0x13, 0x2D, 0x18, 0x0E, 0x1A, 0x1B, 0x29,
             0x01, 0x20, 0x21, 0x22, 0x11, 0x33, 0x26, 0x00,
@@ -37,14 +37,22 @@ namespace DungeonKey.Rounds
             0x25, 0x14, 0x2F, 0x16, 0x06, 0x15
         };
 
+        readonly static byte[] WonderSTable = {
+            0x0E, 0x04, 0x03, 0x18, 0x09, 0x1E, 0x0A, 0x20,
+            0x10, 0x21, 0x14, 0x00, 0x13, 0x16, 0x05, 0x12,
+            0x06, 0x01, 0x17, 0x1C, 0x07, 0x1B, 0x0D, 0x1F,
+            0x15, 0x1A, 0x02, 0x0B, 0x0C, 0x19, 0x0F, 0x08,
+            0x1D, 0x11
+        };
+
         /// <summary>
         /// Encrypt a string by permutating their characters.
         /// </summary>
         /// <param name="data">Data to encrypt.</param>
         /// <returns>Encrypted data.</returns>
-        public static string Encrypt(string data)
+        public static string Encrypt(string data, bool missionTable)
         {
-            return Convert(data, true);
+            return Convert(data, true, missionTable);
         }
 
         /// <summary>
@@ -52,17 +60,18 @@ namespace DungeonKey.Rounds
         /// </summary>
         /// <param name="data">Data to decrypt.</param>
         /// <returns>Decrypted data.</returns>
-        public static string Decrypt(string data)
+        public static string Decrypt(string data, bool missionTable)
         {
-            return Convert(data, false);
+            return Convert(data, false, missionTable);
         }
 
-        static string Convert(string source, bool encrypt)
+        static string Convert(string source, bool encrypt, bool missionTable)
         {
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentNullException(nameof(source));
 
-            if (source.Length > Table.Length)
+            byte[] table = missionTable ? MissionTable : WonderSTable;
+            if (source.Length > table.Length)
                 throw new ArgumentOutOfRangeException(nameof(source));
 
             // Create a filled string so we can substitute characters at any
@@ -71,7 +80,7 @@ namespace DungeonKey.Rounds
             destination.Append(new string('0', source.Length));
 
             for (int i = 0; i < source.Length; i++) {
-                int permIdx = Table[i];
+                int permIdx = table[i];
 
                 if (encrypt)
                     destination[permIdx] = source[i];

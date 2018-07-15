@@ -70,7 +70,7 @@ namespace DungeonKey.Rounds
         /// </summary>
         /// <param name="data">Data to encrypt.</param>
         /// <returns>Encrypted data.</returns>
-        public static string Encrypt(byte[] data)
+        public static string Encrypt(byte[] data, int length)
         {
             if (data.Length == 0)
                 throw new ArgumentNullException(nameof(data));
@@ -79,19 +79,19 @@ namespace DungeonKey.Rounds
             using (DataStream stream = new DataStream()) {
                 stream.Write(data, 0, data.Length);
                 stream.Position = 0;
-                result = Encrypt(stream);
+                result = Encrypt(stream, length);
             }
 
             return result;
         }
 
-        static string Encrypt(DataStream stream)
+        static string Encrypt(DataStream stream, int length)
         {
             // Each 5 bits it's an element to substitute.
             StringBuilder builder = new StringBuilder();
             BitReader reader = new BitReader(stream);
 
-            while (reader.Position + ElementSize < reader.Length) {
+            for (int i = 0; i < length; i++) {
                 int idx = reader.ReadByte(ElementSize);
                 if (idx >= Map.Length)
                     throw new FormatException("Invalid password element");
