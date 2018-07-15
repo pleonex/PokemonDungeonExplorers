@@ -74,7 +74,7 @@ namespace DungeonKey.IO
         /// </summary>
         /// <param name="bits">Bits to write.</param>
         /// <param name="length">Number of bits to write.</param>
-        public void WriteBits(byte[] bits, int length)
+        public void Write(byte[] bits, int length)
         {
             for (int i = 0; i < length; i++) {
                 byte current = bits[i / 8];
@@ -89,9 +89,9 @@ namespace DungeonKey.IO
         /// </summary>
         /// <param name="value">Bits to write.</param>
         /// <param name="length">Number of bits to write.</param>
-        public void WriteByte(byte value, int length)
+        public void Write(byte value, int length)
         {
-            WriteBits(new[] { value }, length);
+            Write(new[] { value }, length);
         }
 
         /// <summary>
@@ -99,9 +99,9 @@ namespace DungeonKey.IO
         /// </summary>
         /// <param name="value">Bits to write.</param>
         /// <param name="length">Number of bits to write.</param>
-        public void WriteUInt16(ushort value, int length)
+        public void Write(ushort value, int length)
         {
-            WriteBits(BitConverter.GetBytes(value), length);
+            Write(BitConverter.GetBytes(value), length);
         }
 
         /// <summary>
@@ -109,9 +109,9 @@ namespace DungeonKey.IO
         /// </summary>
         /// <param name="value">Bits to write.</param>
         /// <param name="length">Number of bits to write.</param>
-        public void WriteUInt32(uint value, int length)
+        public void Write(uint value, int length)
         {
-            WriteBits(BitConverter.GetBytes(value), length);
+            Write(BitConverter.GetBytes(value), length);
         }
 
         /// <summary>
@@ -119,9 +119,9 @@ namespace DungeonKey.IO
         /// </summary>
         /// <param name="value">Bits to write.</param>
         /// <param name="length">Number of bits to write.</param>
-        public void WriteUInt64(ulong value, int length)
+        public void Write(ulong value, int length)
         {
-            WriteBits(BitConverter.GetBytes(value), length);
+            Write(BitConverter.GetBytes(value), length);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace DungeonKey.IO
         /// <param name="value">String to write.</param>
         /// <param name="length">Number of bits to write.</param>
         /// <param name="encoding">Encoding name for encoding chars.</param>
-        public void WriteString(string value, int length, string encoding)
+        public void Write(string value, int length, string encoding)
         {
             byte[] data = Encoding.GetEncoding(encoding).GetBytes(value);
 
@@ -138,7 +138,7 @@ namespace DungeonKey.IO
             if (length > data.Length * 8)
                 Array.Resize(ref data, (length + 7) / 8);
 
-            WriteBits(data, length);
+            Write(data, length);
         }
     }
 }

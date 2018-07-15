@@ -54,7 +54,7 @@ namespace DungeonKey.Rounds
                     if (idx == -1)
                         throw new ArgumentException($"Invalid char: '{data[i]}'");
 
-                    writer.WriteByte((byte)idx, ElementSize);
+                    writer.Write((byte)idx, ElementSize);
                 }
 
                 // Copy

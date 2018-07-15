@@ -99,21 +99,21 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.WriteByte(info.Unknown00, 4);
-            writer.WriteByte(info.Unknown01, 4);
-            writer.WriteByte(info.Unknown02, 4);
-            writer.WriteUInt16(info.Unknown0E, 11);
-            writer.WriteUInt16(info.Unknown10, 11);
-            writer.WriteUInt16(info.Unknown12, 11);
-            writer.WriteUInt16(info.Unknown14, 10);
-            writer.WriteByte(info.Unknown16, 4);
-            writer.WriteUInt16(info.Unknown18, 11);
-            writer.WriteByte(info.Unknown1A, 1);
-            writer.WriteUInt16(info.Unknown1C, 11);
-            writer.WriteUInt32(info.Unknown08, 24);
-            writer.WriteByte(info.Unknown04, 8);
-            writer.WriteByte(info.Unknown05, 8);
-            writer.WriteByte(info.Unknown0C, 8);
+            writer.Write(info.Unknown00, 4);
+            writer.Write(info.Unknown01, 4);
+            writer.Write(info.Unknown02, 4);
+            writer.Write(info.Unknown0E, 11);
+            writer.Write(info.Unknown10, 11);
+            writer.Write(info.Unknown12, 11);
+            writer.Write(info.Unknown14, 10);
+            writer.Write(info.Unknown16, 4);
+            writer.Write(info.Unknown18, 11);
+            writer.Write(info.Unknown1A, 1);
+            writer.Write(info.Unknown1C, 11);
+            writer.Write(info.Unknown08, 24);
+            writer.Write(info.Unknown04, 8);
+            writer.Write(info.Unknown05, 8);
+            writer.Write(info.Unknown0C, 8);
 
             // Write the stream into an array for the rounds.
             // We allocate an extra space for the checksum (first uint)

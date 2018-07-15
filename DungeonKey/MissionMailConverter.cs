@@ -96,21 +96,21 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.WriteByte((byte)info.Type, 4);
-            writer.WriteByte(info.LocationId, 7);
-            writer.WriteByte(info.FloorNumber, 7);
+            writer.Write((byte)info.Type, 4);
+            writer.Write(info.LocationId, 7);
+            writer.Write(info.FloorNumber, 7);
             if (info.Type == MissionState.Sos)
-                writer.WriteUInt32(info.Random, 24);
-            writer.WriteUInt64(info.UID, 64);
-            writer.WriteByte((byte)info.ClientLanguage, 4);
-            writer.WriteString(info.ClientName, 80, EncodingName);
+                writer.Write(info.Random, 24);
+            writer.Write(info.UID, 64);
+            writer.Write((byte)info.ClientLanguage, 4);
+            writer.Write(info.ClientName, 80, EncodingName);
             if (info.Type != MissionState.Sos) {
-                writer.WriteUInt16(info.ObjectID1, 10);
-                writer.WriteUInt16(info.ObjectID2, 10);
+                writer.Write(info.ObjectID1, 10);
+                writer.Write(info.ObjectID2, 10);
             }
 
-            writer.WriteUInt64(info.RescuerUID, 64);
-            writer.WriteByte((byte)info.GameType, 2);
+            writer.Write(info.RescuerUID, 64);
+            writer.Write((byte)info.GameType, 2);
 
             // Write the stream into an array for the rounds.
             // We allocate an extra space for the checksum (first byte)
