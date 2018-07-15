@@ -22,13 +22,13 @@ namespace DungeonKey
     /// <summary>
     /// Information from a mail mission.
     /// </summary>
-    public class MailMissionInformation
+    public class MissionMail
     {
         /// <summary>
         /// Get or set the type of mail.
         /// </summary>
         /// <value>Type of mail.</value>
-        public byte Type { get; set; }
+        public MissionState Type { get; set; }
 
         /// <summary>
         /// Get or set the ID of the mission location.
@@ -43,10 +43,10 @@ namespace DungeonKey
         public byte FloorNumber { get; set; }
 
         /// <summary>
-        /// Get or set an unknown field at position 0x08.
+        /// Get or set the random field.
         /// </summary>
-        /// <value>Unknown field.</value>
-        public uint Unknown08 { get; set; }
+        /// <value>Random field.</value>
+        public uint Random { get; set; }
 
         /// <summary>
         /// Get or set an unknown field at position 0x0C.
@@ -67,10 +67,10 @@ namespace DungeonKey
         public ulong UID { get; set; }
 
         /// <summary>
-        /// Get or set the type of client name.
+        /// Get or set the client language.
         /// </summary>
-        /// <value>Type of client name.</value>
-        public byte ClientNameType { get; set; }
+        /// <value>Client language.</value>
+        public GameLanguage ClientLanguage { get; set; }
 
         /// <summary>
         /// Get or set the client name.
@@ -79,22 +79,22 @@ namespace DungeonKey
         public string ClientName { get; set; }
 
         /// <summary>
-        /// Get or set an unknown field at position 0xA0.
+        /// Get or set the first ID of the gift object..
         /// </summary>
-        /// <value>Unknown field.</value>
-        public ushort UnknownA0 { get; set; }
+        /// <value>First ID of the object.</value>
+        public ushort ObjectID1 { get; set; }
 
         /// <summary>
-        /// Get or set an unknown field at position 0xA2.
+        /// Get or set the second ID of the gift object.
         /// </summary>
-        /// <value>Unknown field.</value>
-        public ushort UnknownA2 { get; set; }
+        /// <value>Second ID of the object.</value>
+        public ushort ObjectID2 { get; set; }
 
         /// <summary>
-        /// Get or set an unknown field at position 0xA4.
+        /// Get or set an the rescuer unique ID.
         /// </summary>
-        /// <value>Unknown field.</value>
-        public ulong UnknownA4 { get; set; }
+        /// <value>Rescuer UID.</value>
+        public ulong RescuerUID { get; set; }
 
         /// <summary>
         /// Get or set the remaining mission attempts.
@@ -123,15 +123,15 @@ namespace DungeonKey
             Console.WriteLine($"* Type: {Type}");
             Console.WriteLine($"* LocationId: 0x{LocationId:X2}");
             Console.WriteLine($"* FloorNumber: {FloorNumber}");
-            Console.WriteLine($"* Unknown08: 0x{Unknown08:X6}");
+            Console.WriteLine($"* Random: 0x{Random:X6}");
             Console.WriteLine($"* Unknown0C: 0x{Unknown0C:X8}");
             Console.WriteLine($"* Unknown10: 0x{Unknown10:X8}");
             Console.WriteLine($"* UID: 0x{UID:X16}");
-            Console.WriteLine($"* ClientNameType: 0x{ClientNameType:X2}");
+            Console.WriteLine($"* ClientLanguage: {ClientLanguage}");
             Console.WriteLine($"* ClientName: {ClientName}");
-            Console.WriteLine($"* UnknownA0: 0x{UnknownA0:X4}");
-            Console.WriteLine($"* UnknownA2: 0x{UnknownA2:X4}");
-            Console.WriteLine($"* UnknownA4: 0x{UnknownA4:X16}");
+            Console.WriteLine($"* ObjectID1: 0x{ObjectID1:X4}");
+            Console.WriteLine($"* ObjectID2: 0x{ObjectID2:X4}");
+            Console.WriteLine($"* RescuerUID: 0x{RescuerUID:X16}");
             Console.WriteLine($"* RemainingAttempts: {RemainingAttempts}");
             Console.WriteLine($"* UnknownAD: 0x{UnknownAD:X2}");
             Console.WriteLine($"* GameType: {GameType}");

@@ -40,25 +40,46 @@ namespace DungeonKey
                 Console.Write("SOS-mail password: ");
                 password = Console.ReadLine();
             } else {
+                Console.WriteLine("SOS-mail password: " + args[0]);
                 password = args[0];
             }
 
-            MailMissionInformation mail = null;
+            MissionMail sosMail = null;
             try {
-                mail = MailMissionConverter.Convert(password);
+                sosMail = MissionMailConverter.Convert(password);
             } catch {
                 Console.WriteLine("Error converting password.");
                 Console.WriteLine("Make sure the password is valid.");
                 Exit(1);
             }
 
-            mail.PrintInformation();
+            sosMail.PrintInformation();
             Console.WriteLine();
 
-            if (MailMissionConverter.Convert(mail) == password)
+            if (MissionMailConverter.Convert(sosMail) == password)
                 Console.WriteLine("\x1B[32m✔\x1B[0m EXACT password generated!");
             else
                 Console.WriteLine("\x1B[91m✖\x1B[0m FAILED to generate pasword");
+
+            Console.WriteLine("Generating rescue mail");
+            AckMail ackMail = new AckMail(sosMail) {
+                GameType = GameType.Time,
+                ClientLanguage = GameLanguage.English,
+                ClientName = "pleonex",
+                ObjectID1 = 0,
+                ObjectID2 = 0x25
+            };
+            ackMail.PrintInformation();
+
+            string ackPassword = MissionMailConverter.Convert(ackMail);
+            Console.WriteLine("Rescue password: " + ackPassword);
+
+            try {
+                MissionMailConverter.Convert(ackPassword);
+                Console.WriteLine("\x1B[32m✔\x1B[0m CORRECT password generated!");
+            } catch {
+                Console.WriteLine("\x1B[91m✖\x1B[0m FAILED to generate pasword");
+            }
 
             Exit(0);
         }

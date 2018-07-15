@@ -25,7 +25,7 @@ namespace DungeonKey
     /// <summary>
     /// Conversion of Mail information into password.
     /// </summary>
-    public static class MailMissionConverter
+    public static class MissionMailConverter
     {
         const int PasswordLength = 0x36;
         const string EncodingName = "iso-8859-1";
@@ -35,7 +35,7 @@ namespace DungeonKey
         /// </summary>
         /// <param name="password">The password to convert.</param>
         /// <returns>Mail information from the password.</returns>
-        public static MailMissionInformation Convert(string password)
+        public static MissionMail Convert(string password)
         {
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
@@ -66,19 +66,19 @@ namespace DungeonKey
             stream.Write(binary, 1, binary.Length - 1);
             BitReader reader = new BitReader(stream);
 
-            MailMissionInformation info = new MailMissionInformation();
-            info.Type = reader.ReadByte(4);
+            MissionMail info = new MissionMail();
+            info.Type = (MissionState)reader.ReadByte(4);
             info.LocationId = reader.ReadByte(7);
             info.FloorNumber = reader.ReadByte(7);
-            info.Unknown08 = (info.Type == 1) ? reader.ReadUInt32(24) : 0x00;
+            info.Random = (info.Type == MissionState.Sos) ? reader.ReadUInt32(24) : 0x00;
             info.Unknown0C = 0x00;
             info.Unknown10 = 0x00;
             info.UID = reader.ReadUInt64(64);
-            info.ClientNameType = reader.ReadByte(4);
+            info.ClientLanguage = (GameLanguage)reader.ReadByte(4);
             info.ClientName = reader.ReadString(80, EncodingName);
-            info.UnknownA0 = (info.Type == 1) ? (ushort)0x00 : reader.ReadUInt16(10);
-            info.UnknownA2 = (info.Type == 1) ? (ushort)0x00 : reader.ReadUInt16(10);
-            info.UnknownA4 = reader.ReadUInt64(64);
+            info.ObjectID1 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
+            info.ObjectID2 = (info.Type == MissionState.Sos) ? (ushort)0x00 : reader.ReadUInt16(10);
+            info.RescuerUID = reader.ReadUInt64(64);
             info.RemainingAttempts = 0x00; // TODO
             info.UnknownAD = 0x01;
             info.GameType = (GameType)reader.ReadByte(2);
@@ -86,7 +86,12 @@ namespace DungeonKey
             return info;
         }
 
-        public static string Convert(MailMissionInformation info)
+        /// <summary>
+        /// Converts a missiong information into a password.
+        /// </summary>
+        /// <param name="info">Mission to convert.</param>
+        /// <returns>The password.</returns>
+        public static string Convert(MissionMail info)
         {
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
@@ -95,20 +100,20 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.WriteByte(info.Type, 4);
+            writer.WriteByte((byte)info.Type, 4);
             writer.WriteByte(info.LocationId, 7);
             writer.WriteByte(info.FloorNumber, 7);
-            if (info.Type == 1)
-                writer.WriteUInt32(info.Unknown08, 24);
+            if (info.Type == MissionState.Sos)
+                writer.WriteUInt32(info.Random, 24);
             writer.WriteUInt64(info.UID, 64);
-            writer.WriteByte(info.ClientNameType, 4);
+            writer.WriteByte((byte)info.ClientLanguage, 4);
             writer.WriteString(info.ClientName, 80, EncodingName);
-            if (info.Type != 1) {
-                writer.WriteUInt16(info.UnknownA0, 10);
-                writer.WriteUInt16(info.UnknownA2, 10);
+            if (info.Type != MissionState.Sos) {
+                writer.WriteUInt16(info.ObjectID1, 10);
+                writer.WriteUInt16(info.ObjectID2, 10);
             }
 
-            writer.WriteUInt64(info.UnknownA4, 64);
+            writer.WriteUInt64(info.RescuerUID, 64);
             writer.WriteByte((byte)info.GameType, 2);
 
             // Write the stream into an array for the rounds.

@@ -18,13 +18,27 @@
 namespace DungeonKey
 {
     /// <summary>
-    /// The version of Pokémon Mystery Dungeon Explorers of X game.
+    /// Acknowledgment mail.
     /// </summary>
-    public enum GameType : byte
+    public class AckMail : MissionMail
     {
-        Time = 0,
-        Darkness = 1,
-        Sky = 2,
-        SkyDarkness = 3
+        /// <summary>
+        /// Initiaze a new instance of the AckMail class from a mission mail.
+        /// </summary>
+        /// <param name="mail">Mission mail to initialize parameters.</param>
+        public AckMail(MissionMail mail)
+        {
+            Type = MissionState.Acknowledgment;
+
+            // Copy info from SOS mail
+            LocationId = mail.LocationId;
+            FloorNumber = mail.FloorNumber;
+            Random = mail.Random;
+            UID = mail.UID;
+
+            var randomGenerator = new System.Random();
+            RescuerUID = (ulong)randomGenerator.Next();
+            RescuerUID |= (ulong)randomGenerator.Next() << 32;
+        }
     }
 }

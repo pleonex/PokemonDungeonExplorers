@@ -20,11 +20,11 @@ namespace DungeonKey
     /// <summary>
     /// The version of Pokémon Mystery Dungeon Explorers of X game.
     /// </summary>
-    public enum GameType : byte
+    public enum MissionState : byte
     {
-        Time = 0,
-        Darkness = 1,
-        Sky = 2,
-        SkyDarkness = 3
+        Unknown = 0,
+        Sos = 1,
+        SosInRescue = 2,
+        Acknowledgment = 4
     }
 }

@@ -17,14 +17,8 @@
 //
 namespace DungeonKey
 {
-    /// <summary>
-    /// The version of Pokémon Mystery Dungeon Explorers of X game.
-    /// </summary>
-    public enum GameType : byte
+    public class ThankYouMail : MissionMail
     {
-        Time = 0,
-        Darkness = 1,
-        Sky = 2,
-        SkyDarkness = 3
+
     }
 }

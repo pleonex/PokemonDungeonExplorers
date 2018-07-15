@@ -18,13 +18,21 @@
 namespace DungeonKey
 {
     /// <summary>
-    /// The version of Pokémon Mystery Dungeon Explorers of X game.
+    /// SOS-rescue mail.
     /// </summary>
-    public enum GameType : byte
+    public class SosMail : MissionMail
     {
-        Time = 0,
-        Darkness = 1,
-        Sky = 2,
-        SkyDarkness = 3
+        /// <summary>
+        /// Initiazes a new instance of the SosMail class.
+        /// </summary>
+        public SosMail()
+        {
+            Type = MissionState.Sos;
+
+            var randomGenerator = new System.Random();
+            Random = (uint)(randomGenerator.Next() & 0x00FFFFFF);
+            UID = (ulong)randomGenerator.Next();
+            UID |= (ulong)randomGenerator.Next() << 32;
+        }
     }
 }

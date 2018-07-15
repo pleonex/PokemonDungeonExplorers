@@ -18,13 +18,16 @@
 namespace DungeonKey
 {
     /// <summary>
-    /// The version of Pokémon Mystery Dungeon Explorers of X game.
+    /// The language of the device playing the game.
     /// </summary>
-    public enum GameType : byte
+    public enum GameLanguage : byte
     {
-        Time = 0,
-        Darkness = 1,
-        Sky = 2,
-        SkyDarkness = 3
+        Japanese = 0,
+        English = 1,
+        French = 2,
+        German = 3,
+        Italian = 4,
+        Spanish = 5,
+        Invalid = 8
     }
 }

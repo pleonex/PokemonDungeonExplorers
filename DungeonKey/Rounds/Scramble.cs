@@ -87,11 +87,11 @@ namespace DungeonKey.Rounds
                 throw new ArgumentOutOfRangeException(nameof(data));
 
             byte tableBlockSize = (byte)((key & 0x0F) + (key >> 4) + 8);
-            int signedKey = key * ((key & 0x01) == 1 ? 1 : -1);
+            int direction = (key & 0x01) == 1 ? 1 : -1;
             int opSign = encrypt ? 1 : -1;
 
             for (int i = 0; i < size; i++) {
-                int idx = (i % tableBlockSize) + signedKey;
+                int idx = ((i % tableBlockSize) * direction) + key;
                 idx &= 0xFF;
                 data[startIdx + i] = (byte)(data[startIdx + i] + (opSign * Table[idx]));
             }
