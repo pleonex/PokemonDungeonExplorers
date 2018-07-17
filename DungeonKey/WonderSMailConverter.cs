@@ -41,6 +41,7 @@ namespace DungeonKey
 
             // Sanitaze and check password
             password = password.Replace(" ", "");
+            password = password.Replace("\t", "");
             password = password.Replace(Environment.NewLine, "");
             password = password.ToUpper();
             if (password.Length != PasswordLength)
@@ -66,21 +67,21 @@ namespace DungeonKey
             BitReader reader = new BitReader(stream);
 
             WonderSMail info = new WonderSMail();
-            info.Unknown00 = reader.ReadByte(4);
-            info.Unknown01 = reader.ReadByte(4);
-            info.Unknown02 = reader.ReadByte(4);
-            info.Unknown0E = reader.ReadUInt16(11);
-            info.Unknown10 = reader.ReadUInt16(11);
-            info.Unknown12 = reader.ReadUInt16(11);
-            info.Unknown14 = reader.ReadUInt16(10);
-            info.Unknown16 = reader.ReadByte(4);
-            info.Unknown18 = reader.ReadUInt16(11);
-            info.Unknown1A = reader.ReadByte(1);
-            info.Unknown1C = reader.ReadUInt16(11);
-            info.Unknown08 = reader.ReadUInt32(24);
-            info.Unknown04 = reader.ReadByte(8);
-            info.Unknown05 = reader.ReadByte(8);
-            info.Unknown0C = reader.ReadByte(8);
+            info.MailType = reader.ReadByte(4);
+            info.MissionType = reader.ReadByte(4);
+            info.MissionSubType = reader.ReadByte(4);
+            info.SourceClientId = reader.ReadUInt16(11);
+            info.TargetClientId = reader.ReadUInt16(11);
+            info.TargetClientFemale = reader.ReadUInt16(11);
+            info.RewardObjectId = reader.ReadUInt16(10);
+            info.RewardType = reader.ReadByte(4);
+            info.RewardId = reader.ReadUInt16(11);
+            info.RestrictionType = reader.ReadByte(1);
+            info.RestrictionParam = reader.ReadUInt16(11);
+            info.Random = reader.ReadUInt32(24);
+            info.LocationId = reader.ReadByte(8);
+            info.FloorNumber = reader.ReadByte(8);
+            info.Requirement = reader.ReadByte(8);
 
             return info;
         }
@@ -99,21 +100,21 @@ namespace DungeonKey
             DataStream stream = new DataStream();
             BitWriter writer = new BitWriter(stream);
 
-            writer.Write(info.Unknown00, 4);
-            writer.Write(info.Unknown01, 4);
-            writer.Write(info.Unknown02, 4);
-            writer.Write(info.Unknown0E, 11);
-            writer.Write(info.Unknown10, 11);
-            writer.Write(info.Unknown12, 11);
-            writer.Write(info.Unknown14, 10);
-            writer.Write(info.Unknown16, 4);
-            writer.Write(info.Unknown18, 11);
-            writer.Write(info.Unknown1A, 1);
-            writer.Write(info.Unknown1C, 11);
-            writer.Write(info.Unknown08, 24);
-            writer.Write(info.Unknown04, 8);
-            writer.Write(info.Unknown05, 8);
-            writer.Write(info.Unknown0C, 8);
+            writer.Write(info.MailType, 4);
+            writer.Write(info.MissionType, 4);
+            writer.Write(info.MissionSubType, 4);
+            writer.Write(info.SourceClientId, 11);
+            writer.Write(info.TargetClientId, 11);
+            writer.Write(info.TargetClientFemale, 11);
+            writer.Write(info.RewardObjectId, 10);
+            writer.Write(info.RewardType, 4);
+            writer.Write(info.RewardId, 11);
+            writer.Write(info.RestrictionType, 1);
+            writer.Write(info.RestrictionParam, 11);
+            writer.Write(info.Random, 24);
+            writer.Write(info.LocationId, 8);
+            writer.Write(info.FloorNumber, 8);
+            writer.Write(info.Requirement, 8);
 
             // Write the stream into an array for the rounds.
             // We allocate an extra space for the checksum (first uint)
