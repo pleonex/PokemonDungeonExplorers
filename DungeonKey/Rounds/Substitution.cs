@@ -31,6 +31,7 @@ namespace DungeonKey.Rounds
     public static class Substitution
     {
         const string Map = "&67NPR89F0+#STXY45MCHJ-K12=%3Q@W";
+        const string MapJp = "\x07$%CGK&'3\x1E\x16\x04MOWY\"#A-7;\x01=\x1F \x18\x06!I\x10U";
         const int ElementSize = 5;
 
         /// <summary>
